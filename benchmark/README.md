@@ -4,6 +4,19 @@ This directory contains configuration, test matrices, raw evaluation reports, an
 
 ---
 
+## Table of Contents
+
+- [Tool Paradigm: Declarative Engine vs. General-Purpose Scanner](#tool-paradigm-declarative-engine-vs-general-purpose-scanner)
+- [Milestone Evolution](#milestone-evolution)
+- [Directory Structure](#directory-structure)
+- [Evaluation Results Comparison](#evaluation-results-comparison-milestones-2--3)
+- [Tamper-Evident Evidence Bundles](#milestone-4-tamper-evident-evidence-bundles)
+- [Milestone 5: Reproducible Benchmark Runner](#milestone-5-reproducible-benchmark-runner)
+- [Reproducing the Benchmark Runs](#reproducing-the-benchmark-runs)
+- [Unsupported and Deferred Scenarios](#unsupported-and-deferred-scenarios)
+
+---
+
 ## Tool Paradigm: Declarative Engine vs. General-Purpose Scanner
 
 Before reviewing the results, it is critical to distinguish between the two primary classes of API security testing tools:
@@ -231,7 +244,7 @@ Existing historical results in `benchmark/results/` and baseline signed bundles 
 ```powershell
 .\.venv\Scripts\python.exe -m benchmark.runner `
     --signing-key "$env:USERPROFILE\.accessbound\keys\lab_signer.private.pem" `
-    --trusted-public-key "$env:USERPROFILE\.accessbound\keys\lab_signer.public.pem"
+    --trusted-public-key keys/trusted_lab_signer.pub.pem
 ```
 
 **Unsigned run (when signing key is not available):**
@@ -241,13 +254,13 @@ Existing historical results in `benchmark/results/` and baseline signed bundles 
 
 ### 3. Verify an Evidence Bundle
 
-**Trusted verification with external public key:**
+**Trusted verification with repository's trusted public key:**
 ```powershell
 .\.venv\Scripts\python.exe -m benchmark.evidence verify benchmark/runs/<run-id>/bundle `
-    --trusted-public-key "$env:USERPROFILE\.accessbound\keys\lab_signer.public.pem"
+    --trusted-public-key keys/trusted_lab_signer.pub.pem
 ```
 
-**Self-consistency verification:**
+**Self-consistency verification (bundled key):**
 ```powershell
 .\.venv\Scripts\python.exe -m benchmark.evidence verify benchmark/runs/<run-id>/bundle
 ```
@@ -256,7 +269,7 @@ Existing historical results in `benchmark/results/` and baseline signed bundles 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -v -W default
 ```
-*Executes all 36 automated tests across ground-truth, evidence bundles, and runner workflow.*
+*Executes all 40 automated tests across ground-truth, evidence bundles, and runner workflow.*
 
 ---
 

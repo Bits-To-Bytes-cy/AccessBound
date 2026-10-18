@@ -171,9 +171,12 @@ class BenchmarkRunner:
 
     def _detect_overstep_exe(self) -> Path:
         """Find overstep executable in .venv-overstep or current PATH."""
-        venv_candidate = Path(".venv-overstep/Scripts/overstep.exe")
-        if venv_candidate.is_file():
-            return venv_candidate.resolve()
+        for candidate in (
+            Path(".venv-overstep/Scripts/overstep.exe"),
+            Path(".venv-overstep/bin/overstep"),
+        ):
+            if candidate.is_file():
+                return candidate.resolve()
         import shutil
 
         which_path = shutil.which("overstep")
@@ -184,12 +187,16 @@ class BenchmarkRunner:
     def _detect_overstep_python(self) -> Path:
         """Find the Python executable associated with overstep."""
         if self.overstep_exe and self.overstep_exe.is_file():
-            py_cand = self.overstep_exe.parent / "python.exe"
-            if py_cand.is_file():
-                return py_cand.resolve()
-        venv_py = Path(".venv-overstep/Scripts/python.exe")
-        if venv_py.is_file():
-            return venv_py.resolve()
+            for name in ("python.exe", "python", "python3"):
+                py_cand = self.overstep_exe.parent / name
+                if py_cand.is_file():
+                    return py_cand.resolve()
+        for candidate in (
+            Path(".venv-overstep/Scripts/python.exe"),
+            Path(".venv-overstep/bin/python"),
+        ):
+            if candidate.is_file():
+                return candidate.resolve()
         return Path(sys.executable)
 
     def _extract_plan_cases(self) -> List[Dict[str, Any]]:

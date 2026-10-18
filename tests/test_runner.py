@@ -18,11 +18,19 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+import shutil
+
 from benchmark.evidence import generate_keypair
 from benchmark.runner import (
     BenchmarkRunner,
     compute_public_key_fingerprint,
     validate_target_safety,
+)
+
+OVERSTEP_AVAILABLE = bool(
+    shutil.which("overstep")
+    or Path(".venv-overstep/Scripts/overstep.exe").is_file()
+    or Path(".venv-overstep/bin/overstep").is_file()
 )
 
 
@@ -294,6 +302,10 @@ def test_full_runner_lifecycle_execution_order(tmp_path: Path):
     assert manifest["metadata"]["signer_public_key_fingerprint_sha256"] == expected_fp
 
 
+@pytest.mark.skipif(
+    not OVERSTEP_AVAILABLE,
+    reason="Overstep is not installed in .venv-overstep or PATH; core suite does not require Overstep in main environment",
+)
 def test_inspect_plan_extracts_all_16_cases():
     """Verify inspect_plan extracts all 16 cases across 4 resources and 2 identities."""
     runner = BenchmarkRunner(matrix_path=Path("benchmark/overstep-matrix.yaml"))

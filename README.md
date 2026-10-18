@@ -6,6 +6,40 @@ AccessBound is a **controlled research lab and benchmark harness** for evaluatin
 
 ---
 
+## Table of Contents
+
+- [⚡ Quick Start (60 Seconds)](#-quick-start-60-seconds)
+- [Architecture Overview](#architecture-overview)
+- [Status & Test Suite](#status--test-suite)
+- [Safety, Ethics, and Limitations](#safety-ethics-and-limitations)
+- [Setup & Clean Reproduction](#setup--clean-reproduction-windows-powershell)
+- [Running the Reproducible Benchmark](#running-the-reproducible-benchmark)
+- [Benchmark Results & Metrics Summary](#benchmark-results--metrics-summary)
+- [Verifying Cryptographic Evidence Bundles](#verifying-cryptographic-evidence-bundles)
+- [Trusted Public-Key Distribution](#trusted-public-key-distribution)
+- [Portfolio Demonstration (90-Second Walkthrough)](#portfolio-demonstration-90-second-walkthrough)
+- [Repository Layout](#repository-layout)
+
+---
+
+## ⚡ Quick Start (60 Seconds)
+
+Get AccessBound running and verify a signed benchmark evidence bundle in 3 commands:
+
+```powershell
+# 1. Install dependencies and run the complete test suite (40 tests)
+pip install -r requirements.txt
+pytest -v -W default
+
+# 2. Start the local API server (terminal 1)
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# 3. Verify a cryptographically signed evidence bundle using the trusted public key (terminal 2)
+python -m benchmark.evidence verify benchmark/runs/run-20261014-185014/bundle --trusted-public-key keys/trusted_lab_signer.pub.pem
+```
+
+---
+
 ## Architecture Overview
 
 ```mermaid
@@ -46,9 +80,9 @@ flowchart TD
 
 ---
 
-## Current Status & Test Suite
+## Status & Test Suite
 
-The project includes 40 automated tests passing with zero failures across three test modules:
+The project includes **40 automated tests** passing with zero failures across three test modules:
 
 1. **Ground-Truth Tests (`tests/test_ground_truth.py`)**: 19 tests verifying positive controls, deliberate BOLA vulnerabilities, secure boundaries, owner checks, admin checks, missing identity rejection, and parent/child relationship integrity.
 2. **Cryptographic Evidence Tests (`tests/test_evidence.py`)**: 8 tests verifying manifest canonicalization, SHA-256 file hashing, Ed25519 signature validation, hash mismatch detection, manifest tampering detection, path traversal rejection, and untracked file detection.
@@ -114,7 +148,7 @@ New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.accessbound\keys"
     --pub "$env:USERPROFILE\.accessbound\keys\lab_signer.public.pem"
 ```
 
-> **Security Rule**: Private signing keys must **never** be committed to Git. The `.gitignore` excludes `*.key`, `*.private.pem`, and `private_key.pem`, while allowing public keys (`!public_key.pem`) for verification.
+> **Security Rule**: Private signing keys must **never** be committed to Git. The `.gitignore` excludes `*.key`, `*.private.pem`, and `private_key.pem`, while allowing public keys (`!public_key.pem`, `!*.pub.pem`) for verification.
 
 ---
 
@@ -132,7 +166,7 @@ In terminal 2:
 ```powershell
 .\.venv\Scripts\python.exe -m benchmark.runner `
     --signing-key "$env:USERPROFILE\.accessbound\keys\lab_signer.private.pem" `
-    --trusted-public-key "$env:USERPROFILE\.accessbound\keys\lab_signer.public.pem"
+    --trusted-public-key keys/trusted_lab_signer.pub.pem
 ```
 
 The runner automatically:
@@ -175,11 +209,11 @@ The runner automatically:
 
 Evidence bundles use deterministic canonical JSON serialization (`canonicalize_manifest`), SHA-256 file hashes, and Ed25519 digital signatures.
 
-### 1. Trusted Verification (External Public Key)
+### 1. Trusted Verification (Using Separately Stored Public Key)
 Verifies that the bundle has not been altered and was signed by the specific trusted key:
 ```powershell
-.\.venv\Scripts\python.exe -m benchmark.evidence verify benchmark/runs/<run-id>/bundle `
-    --trusted-public-key "$env:USERPROFILE\.accessbound\keys\lab_signer.public.pem"
+.\.venv\Scripts\python.exe -m benchmark.evidence verify benchmark/runs/run-20261014-185014/bundle `
+    --trusted-public-key keys/trusted_lab_signer.pub.pem
 ```
 Output:
 ```text
@@ -192,23 +226,39 @@ Output:
 ### 2. Self-Consistency Verification (Bundled Public Key)
 Verifies internal bundle consistency without out-of-band trust:
 ```powershell
-.\.venv\Scripts\python.exe -m benchmark.evidence verify benchmark/runs/<run-id>/bundle
+.\.venv\Scripts\python.exe -m benchmark.evidence verify benchmark/runs/run-20261014-185014/bundle
 ```
-
-> **Public Key Fingerprint**: The manifest metadata records the SHA-256 fingerprint of the signer's public key (e.g., `487461557a51f039...`). This fingerprint serves as an identifier for key tracking; trusted verification requires checking against an independently stored, trusted public key.
 
 ---
 
-## Demonstration Checklist
+## Trusted Public-Key Distribution
 
-- [ ] **1. Clean Environment**: Clone repository, create `.venv`, install `requirements.txt`.
-- [ ] **2. Test Suite**: Run `pytest -v -W default` (all 40 tests pass).
-- [ ] **3. Tool Isolation**: Verify `.venv-overstep` has `overstep 1.7.0` and `.venv` does not require `overstep`.
-- [ ] **4. Target Safety**: Attempt to run runner with non-local target (e.g. `--target http://example.com:8000`); verify immediate rejection before network execution.
-- [ ] **5. Start Lab API**: Run `uvicorn app.main:app --host 127.0.0.1 --port 8000`.
-- [ ] **6. Run Benchmark**: Execute `python -m benchmark.runner` with signing keys. Verify raw artifacts and evaluation summary in `benchmark/runs/<run-id>/`.
-- [ ] **7. Cryptographic Verification**: Run `benchmark.evidence verify` using `--trusted-public-key`.
-- [ ] **8. Tamper Detection**: Modify a single byte in `evidence/findings.json`; rerun verify and observe immediate `[FAIL] Hash mismatch`.
+To ensure tamper-evidence can be verified by independent third parties, the public key used for official benchmark run signing is distributed at:
+
+📁 **`keys/trusted_lab_signer.pub.pem`**
+
+### Verifying the Public-Key Fingerprint
+
+Before relying on verification results, compare the public key's SHA-256 fingerprint against the documented authoritative fingerprint:
+
+```powershell
+.\.venv\Scripts\python.exe -c "from pathlib import Path; from benchmark.evidence import load_public_key; from benchmark.runner import compute_public_key_fingerprint; pub = load_public_key(Path('keys/trusted_lab_signer.pub.pem').read_bytes()); print(compute_public_key_fingerprint(pub))"
+```
+
+**Expected Authoritative Fingerprint**:
+```text
+487461557a51f03979b3eb3de74b282f570a3ae8e0c578a9b9d9029738273f0e
+```
+
+> **Fingerprint vs. Trust**: The fingerprint is a cryptographic hash of the SubjectPublicKeyInfo DER bytes that uniquely identifies the key. It confirms that `keys/trusted_lab_signer.pub.pem` matches the key used to sign `manifest.json`. Trust in the signer itself is established through this repository's commit history and authoritative release channel.
+
+---
+
+## Portfolio Demonstration (90-Second Walkthrough)
+
+For a step-by-step, 90-second technical demonstration with speaker notes, live curl commands, runner execution, and evidence tampering demonstrations, consult:
+
+📖 **[`docs/demo-script.md`](docs/demo-script.md)**
 
 ---
 
@@ -233,10 +283,16 @@ benchmark/                      # Benchmark test matrices, runner, and evidence
     └── run-20261014-185014/
 data/                           # Ground-truth catalog
 └── ground_truth.json           # Machine-readable test case specifications
+docs/                           # Documentation and guides
+└── demo-script.md              # 90-second reproducible demonstration script
+keys/                           # Public key distribution
+└── trusted_lab_signer.pub.pem  # Authoritative public key for evidence verification
 tests/                          # Automated regression and integrity tests
 ├── test_ground_truth.py        # 19 ground-truth endpoint tests
 ├── test_evidence.py            # 8 cryptographic evidence bundle tests
 └── test_runner.py              # 13 benchmark runner workflow tests
+.github/workflows/              # Continuous integration workflows
+└── ci.yml                      # GitHub Actions core test & verification workflow
 requirements.txt                # Core lab dependencies
 .gitignore                      # Private key and local environment exclusions
 ```
