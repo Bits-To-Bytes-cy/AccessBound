@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="overstep" tests="16" failures="4">
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/101 [alice/self]"/>
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/102 [alice/other]">
+    <failure type="BOLA" message="BOLA: alice (customer) read another subject's object via GET /lab/vulnerable/accounts/102 and got 200 and the response exposed the owner's data (BOB_); the matrix only allows owners here.">alice (customer) read another subject's object via GET /lab/vulnerable/accounts/102 and got 200 and the response exposed the owner's data (BOB_); the matrix only allows owners here.</failure>
+  </testcase>
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/102 [bob/self]"/>
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/101 [bob/other]">
+    <failure type="BOLA" message="BOLA: bob (customer) read another subject's object via GET /lab/vulnerable/accounts/101 and got 200 and the response exposed the owner's data (ALICE_); the matrix only allows owners here.">bob (customer) read another subject's object via GET /lab/vulnerable/accounts/101 and got 200 and the response exposed the owner's data (ALICE_); the matrix only allows owners here.</failure>
+  </testcase>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/101 [alice/self]"/>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/102 [alice/other]"/>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/102 [bob/self]"/>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/101 [bob/other]"/>
+  <testcase classname="vulnerable_read_nested_document" name="GET /lab/vulnerable/projects/201/documents/301 [alice/self]"/>
+  <testcase classname="vulnerable_read_nested_document" name="GET /lab/vulnerable/projects/202/documents/302 [alice/other]">
+    <failure type="BOLA" message="BOLA: alice (customer) read another subject's object via GET /lab/vulnerable/projects/202/documents/302 and got 200 and the response exposed the owner's data (BOB_); the matrix only allows owners here.">alice (customer) read another subject's object via GET /lab/vulnerable/projects/202/documents/302 and got 200 and the response exposed the owner's data (BOB_); the matrix only allows owners here.</failure>
+  </testcase>
+  <testcase classname="vulnerable_read_nested_document" name="GET /lab/vulnerable/projects/202/documents/302 [bob/self]"/>
+  <testcase classname="vulnerable_read_nested_document" name="GET /lab/vulnerable/projects/201/documents/301 [bob/other]">
+    <failure type="BOLA" message="BOLA: bob (customer) read another subject's object via GET /lab/vulnerable/projects/201/documents/301 and got 200 and the response exposed the owner's data (ALICE_); the matrix only allows owners here.">bob (customer) read another subject's object via GET /lab/vulnerable/projects/201/documents/301 and got 200 and the response exposed the owner's data (ALICE_); the matrix only allows owners here.</failure>
+  </testcase>
+  <testcase classname="secure_read_nested_document" name="GET /lab/secure/projects/201/documents/301 [alice/self]"/>
+  <testcase classname="secure_read_nested_document" name="GET /lab/secure/projects/202/documents/302 [alice/other]"/>
+  <testcase classname="secure_read_nested_document" name="GET /lab/secure/projects/202/documents/302 [bob/self]"/>
+  <testcase classname="secure_read_nested_document" name="GET /lab/secure/projects/201/documents/301 [bob/other]"/>
+</testsuite>

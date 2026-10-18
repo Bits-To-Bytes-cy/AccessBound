@@ -1,0 +1,107 @@
+# Overstep Authorization Benchmark Matrix for AccessBound (Milestone 3)
+# Target: http://127.0.0.1:8000
+# Operations: Read-only Account & Nested Document BOLA Scenarios
+
+roles:
+  - customer
+
+modules:
+  rest:
+    base_url: "http://127.0.0.1:8000"
+
+subjects:
+  - name: alice
+    role: customer
+    headers:
+      X-Lab-User: "alice"
+    marker: "ALICE_"
+    attributes:
+      account_id: "101"
+      project_id: "201"
+      document_id: "301"
+
+  - name: bob
+    role: customer
+    headers:
+      X-Lab-User: "bob"
+    marker: "BOB_"
+    attributes:
+      account_id: "102"
+      project_id: "202"
+      document_id: "302"
+
+resources:
+  - name: vulnerable_read_account
+    description: "Deliberately vulnerable BOLA read: any identity can read any account"
+    request:
+      method: GET
+      path: "/lab/vulnerable/accounts/{id}"
+    type: object
+    owner: id
+    owner_attr: account_id
+    objects:
+      alice: "101"
+      bob: "102"
+
+  - name: secure_read_account
+    description: "Secure control read: only account owner can read their account"
+    request:
+      method: GET
+      path: "/lab/secure/accounts/{id}"
+    type: object
+    owner: id
+    owner_attr: account_id
+    objects:
+      alice: "101"
+      bob: "102"
+
+  - name: vulnerable_read_nested_document
+    description: "Deliberate nested authorization flaw: verifies linkage, not project ownership"
+    request:
+      method: GET
+      path: "/lab/vulnerable/projects/{project_id}/documents/{document_id}"
+    type: object
+    ownership:
+      injections:
+        - location: path
+          selector: project_id
+          owner_attr: project_id
+        - location: path
+          selector: document_id
+          owner_attr: document_id
+
+  - name: secure_read_nested_document
+    description: "Secure control: checks both document linkage and project ownership"
+    request:
+      method: GET
+      path: "/lab/secure/projects/{project_id}/documents/{document_id}"
+    type: object
+    ownership:
+      injections:
+        - location: path
+          selector: project_id
+          owner_attr: project_id
+        - location: path
+          selector: document_id
+          owner_attr: document_id
+
+policy:
+  vulnerable_read_account:
+    allow:
+      - role: customer
+        scope: own
+
+  secure_read_account:
+    allow:
+      - role: customer
+        scope: own
+
+  vulnerable_read_nested_document:
+    allow:
+      - role: customer
+        scope: own
+
+  secure_read_nested_document:
+    allow:
+      - role: customer
+        scope: own

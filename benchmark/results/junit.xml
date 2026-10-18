@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="overstep" tests="8" failures="2">
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/101 [alice/self]"/>
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/102 [alice/other]">
+    <failure type="BOLA" message="BOLA: alice (customer) read another subject's object via GET /lab/vulnerable/accounts/102 and got 200 and the response exposed the owner's data (BOB_PRIVATE_CANARY_AB102); the matrix only allows owners here.">alice (customer) read another subject's object via GET /lab/vulnerable/accounts/102 and got 200 and the response exposed the owner's data (BOB_PRIVATE_CANARY_AB102); the matrix only allows owners here.</failure>
+  </testcase>
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/102 [bob/self]"/>
+  <testcase classname="vulnerable_read_account" name="GET /lab/vulnerable/accounts/101 [bob/other]">
+    <failure type="BOLA" message="BOLA: bob (customer) read another subject's object via GET /lab/vulnerable/accounts/101 and got 200 and the response exposed the owner's data (ALICE_PRIVATE_CANARY_AB101); the matrix only allows owners here.">bob (customer) read another subject's object via GET /lab/vulnerable/accounts/101 and got 200 and the response exposed the owner's data (ALICE_PRIVATE_CANARY_AB101); the matrix only allows owners here.</failure>
+  </testcase>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/101 [alice/self]"/>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/102 [alice/other]"/>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/102 [bob/self]"/>
+  <testcase classname="secure_read_account" name="GET /lab/secure/accounts/101 [bob/other]"/>
+</testsuite>

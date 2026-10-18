@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1",
+  "note": "Starter ground truth for a localhost-only intentionally vulnerable lab. Test expected behavior in tests/test_ground_truth.py.",
+  "identities": {
+    "alice": {"role": "customer", "owned_account_ids": [101], "owned_project_ids": [201], "owned_document_ids": [301]},
+    "bob": {"role": "customer", "owned_account_ids": [102], "owned_project_ids": [202], "owned_document_ids": [302]},
+    "admin": {"role": "admin", "owned_account_ids": [], "owned_project_ids": [], "owned_document_ids": []}
+  },
+  "cases": [
+    {"id": "AB-BOLA-001", "method": "GET", "path": "/lab/vulnerable/accounts/102", "identity": "alice", "expected_vulnerable": true, "issue_class": "BOLA/read", "oracle": "Response includes owner=bob and BOB_PRIVATE_CANARY_AB102."},
+    {"id": "AB-BOLA-002", "method": "GET", "path": "/lab/secure/accounts/102", "identity": "alice", "expected_vulnerable": false, "issue_class": "BOLA/read", "oracle": "HTTP 403; private marker is not disclosed."},
+    {"id": "AB-BOLA-003", "method": "PATCH", "path": "/lab/vulnerable/accounts/102", "identity": "alice", "expected_vulnerable": true, "issue_class": "BOLA/write", "body": {"nickname": "changed-by-alice-in-lab"}, "oracle": "HTTP 200 and nickname changes."},
+    {"id": "AB-BOLA-004", "method": "PATCH", "path": "/lab/secure/accounts/102", "identity": "alice", "expected_vulnerable": false, "issue_class": "BOLA/write", "body": {"nickname": "must-not-change"}, "oracle": "HTTP 403 and state remains unchanged."},
+    {"id": "AB-BFLA-001", "method": "POST", "path": "/lab/vulnerable/admin/reports", "identity": "alice", "expected_vulnerable": true, "issue_class": "BFLA", "body": {"title": "lab-only test"}, "oracle": "HTTP 200 for a customer identity."},
+    {"id": "AB-BFLA-002", "method": "POST", "path": "/lab/secure/admin/reports", "identity": "alice", "expected_vulnerable": false, "issue_class": "BFLA", "body": {"title": "lab-only test"}, "oracle": "HTTP 403 for a customer identity."},
+    {"id": "AB-NESTED-001", "method": "GET", "path": "/lab/vulnerable/projects/202/documents/302", "identity": "alice", "expected_vulnerable": true, "issue_class": "nested-resource authorization", "oracle": "Response includes BOB_DOC_CANARY_AB302."},
+    {"id": "AB-NESTED-002", "method": "GET", "path": "/lab/secure/projects/202/documents/302", "identity": "alice", "expected_vulnerable": false, "issue_class": "nested-resource authorization", "oracle": "HTTP 403; private marker is not disclosed."},
+    {"id": "AB-NESTED-003", "method": "GET", "path": "/lab/vulnerable/projects/201/documents/301", "identity": "bob", "expected_vulnerable": true, "issue_class": "nested-resource authorization", "oracle": "Response includes ALICE_DOC_CANARY_AB301."},
+    {"id": "AB-NESTED-004", "method": "GET", "path": "/lab/secure/projects/201/documents/301", "identity": "bob", "expected_vulnerable": false, "issue_class": "nested-resource authorization", "oracle": "HTTP 403; private marker is not disclosed."},
+    {"id": "AB-NESTED-005", "method": "GET", "path": "/lab/vulnerable/projects/201/documents/302", "identity": "alice", "expected_vulnerable": false, "issue_class": "nested-resource integrity", "oracle": "HTTP 404; document does not belong to project."},
+    {"id": "AB-NESTED-006", "method": "GET", "path": "/lab/secure/projects/201/documents/302", "identity": "alice", "expected_vulnerable": false, "issue_class": "nested-resource integrity", "oracle": "HTTP 404; document does not belong to project."},
+    {"id": "AB-BOLA-005", "method": "GET", "path": "/lab/vulnerable/accounts/101", "identity": "bob", "expected_vulnerable": true, "issue_class": "BOLA/read", "oracle": "Response includes owner=alice and ALICE_PRIVATE_CANARY_AB101."},
+    {"id": "AB-BOLA-006", "method": "GET", "path": "/lab/secure/accounts/101", "identity": "bob", "expected_vulnerable": false, "issue_class": "BOLA/read", "oracle": "HTTP 403; private marker is not disclosed."}
+  ]
+}

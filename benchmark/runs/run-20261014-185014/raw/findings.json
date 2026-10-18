@@ -1,0 +1,259 @@
+{
+  "base_url": "http://127.0.0.1:8000",
+  "summary": {
+    "total_tests": 16,
+    "positive_tests": 8,
+    "negative_tests": 8,
+    "listing_tests": 0,
+    "findings": 4,
+    "vulnerabilities": 4,
+    "defects": 2,
+    "vulnerability_defects": 2,
+    "drift": 0,
+    "waived": 0,
+    "by_class": {
+      "BOLA": 4
+    },
+    "inconclusive": false,
+    "inconclusive_reasons": [],
+    "undelivered_tests": 0,
+    "undelivered_negative_tests": 0,
+    "untested_surfaces": [],
+    "read_only": true,
+    "skipped_tests": 0,
+    "skipped_surfaces": [],
+    "object_resources": 4,
+    "object_resources_probed": 4,
+    "object_resources_unprobed": []
+  },
+  "defects": [
+    {
+      "group": "vulnerable_read_account::GET::BOLA",
+      "vuln_class": "BOLA",
+      "resource": "vulnerable_read_account",
+      "method": "GET",
+      "severity": "high",
+      "confidence": "confirmed",
+      "findings": 2,
+      "subjects": [
+        "alice",
+        "bob"
+      ],
+      "example_test_id": "vulnerable_read_account::alice::other"
+    },
+    {
+      "group": "vulnerable_read_nested_document::GET::BOLA",
+      "vuln_class": "BOLA",
+      "resource": "vulnerable_read_nested_document",
+      "method": "GET",
+      "severity": "high",
+      "confidence": "confirmed",
+      "findings": 2,
+      "subjects": [
+        "alice",
+        "bob"
+      ],
+      "example_test_id": "vulnerable_read_nested_document::alice::other"
+    }
+  ],
+  "findings": [
+    {
+      "test_id": "vulnerable_read_account::alice::other",
+      "vuln_class": "BOLA",
+      "severity": "high",
+      "resource": "vulnerable_read_account",
+      "subject": "alice",
+      "role": "customer",
+      "method": "GET",
+      "path": "/lab/vulnerable/accounts/102",
+      "expected": "deny",
+      "observed": "allow",
+      "status": 200,
+      "variant": "other",
+      "detail": "alice (customer) read another subject's object via GET /lab/vulnerable/accounts/102 and got 200 and the response exposed the owner's data (BOB_); the matrix only allows owners here.",
+      "evidence": {
+        "test_id": "vulnerable_read_account::alice::other",
+        "status": 200,
+        "effect": "allow",
+        "latency_ms": 41.9,
+        "headers": {
+          "date": "Wed, 14 Oct 2026 18:50:20 GMT",
+          "server": "uvicorn",
+          "content-length": "136",
+          "content-type": "application/json"
+        },
+        "body_snippet": "{\"id\":102,\"owner\":\"bob\",\"balance\":2450,\"nickname\":\"Bob test account\",\"private_marker\":\"BOB_PRIVATE_CANARY_AB102\",\"requested_by\":\"alice\"}",
+        "full_body": "",
+        "error": null,
+        "matched_markers": [
+          "BOB_"
+        ],
+        "listed_tools": [],
+        "skipped": false
+      },
+      "curl": "curl -sS -X GET -H 'X-Lab-User: alice' http://127.0.0.1:8000/lab/vulnerable/accounts/102",
+      "request": {
+        "method": "GET",
+        "url": "http://127.0.0.1:8000/lab/vulnerable/accounts/102",
+        "headers": {
+          "X-Lab-User": "alice"
+        },
+        "body": null
+      },
+      "confidence": "confirmed",
+      "leaked_fields": [],
+      "group": "vulnerable_read_account::GET::BOLA",
+      "cwe": "CWE-639",
+      "owasp_api": "API1:2023 Broken Object Level Authorization"
+    },
+    {
+      "test_id": "vulnerable_read_account::bob::other",
+      "vuln_class": "BOLA",
+      "severity": "high",
+      "resource": "vulnerable_read_account",
+      "subject": "bob",
+      "role": "customer",
+      "method": "GET",
+      "path": "/lab/vulnerable/accounts/101",
+      "expected": "deny",
+      "observed": "allow",
+      "status": 200,
+      "variant": "other",
+      "detail": "bob (customer) read another subject's object via GET /lab/vulnerable/accounts/101 and got 200 and the response exposed the owner's data (ALICE_); the matrix only allows owners here.",
+      "evidence": {
+        "test_id": "vulnerable_read_account::bob::other",
+        "status": 200,
+        "effect": "allow",
+        "latency_ms": 45.7,
+        "headers": {
+          "date": "Wed, 14 Oct 2026 18:50:20 GMT",
+          "server": "uvicorn",
+          "content-length": "140",
+          "content-type": "application/json"
+        },
+        "body_snippet": "{\"id\":101,\"owner\":\"alice\",\"balance\":1200,\"nickname\":\"Alice test account\",\"private_marker\":\"ALICE_PRIVATE_CANARY_AB101\",\"requested_by\":\"bob\"}",
+        "full_body": "",
+        "error": null,
+        "matched_markers": [
+          "ALICE_"
+        ],
+        "listed_tools": [],
+        "skipped": false
+      },
+      "curl": "curl -sS -X GET -H 'X-Lab-User: bob' http://127.0.0.1:8000/lab/vulnerable/accounts/101",
+      "request": {
+        "method": "GET",
+        "url": "http://127.0.0.1:8000/lab/vulnerable/accounts/101",
+        "headers": {
+          "X-Lab-User": "bob"
+        },
+        "body": null
+      },
+      "confidence": "confirmed",
+      "leaked_fields": [],
+      "group": "vulnerable_read_account::GET::BOLA",
+      "cwe": "CWE-639",
+      "owasp_api": "API1:2023 Broken Object Level Authorization"
+    },
+    {
+      "test_id": "vulnerable_read_nested_document::alice::other",
+      "vuln_class": "BOLA",
+      "severity": "high",
+      "resource": "vulnerable_read_nested_document",
+      "subject": "alice",
+      "role": "customer",
+      "method": "GET",
+      "path": "/lab/vulnerable/projects/202/documents/302",
+      "expected": "deny",
+      "observed": "allow",
+      "status": 200,
+      "variant": "other",
+      "detail": "alice (customer) read another subject's object via GET /lab/vulnerable/projects/202/documents/302 and got 200 and the response exposed the owner's data (BOB_); the matrix only allows owners here.",
+      "evidence": {
+        "test_id": "vulnerable_read_nested_document::alice::other",
+        "status": 200,
+        "effect": "allow",
+        "latency_ms": 37.3,
+        "headers": {
+          "date": "Wed, 14 Oct 2026 18:50:20 GMT",
+          "server": "uvicorn",
+          "content-length": "143",
+          "content-type": "application/json"
+        },
+        "body_snippet": "{\"id\":302,\"project_id\":202,\"title\":\"Bob private notes\",\"marker\":\"BOB_DOC_CANARY_AB302\",\"project_name\":\"Bob Lab Project\",\"requested_by\":\"alice\"}",
+        "full_body": "",
+        "error": null,
+        "matched_markers": [
+          "BOB_"
+        ],
+        "listed_tools": [],
+        "skipped": false
+      },
+      "curl": "curl -sS -X GET -H 'X-Lab-User: alice' http://127.0.0.1:8000/lab/vulnerable/projects/202/documents/302",
+      "request": {
+        "method": "GET",
+        "url": "http://127.0.0.1:8000/lab/vulnerable/projects/202/documents/302",
+        "headers": {
+          "X-Lab-User": "alice"
+        },
+        "body": null
+      },
+      "confidence": "confirmed",
+      "leaked_fields": [],
+      "group": "vulnerable_read_nested_document::GET::BOLA",
+      "cwe": "CWE-639",
+      "owasp_api": "API1:2023 Broken Object Level Authorization"
+    },
+    {
+      "test_id": "vulnerable_read_nested_document::bob::other",
+      "vuln_class": "BOLA",
+      "severity": "high",
+      "resource": "vulnerable_read_nested_document",
+      "subject": "bob",
+      "role": "customer",
+      "method": "GET",
+      "path": "/lab/vulnerable/projects/201/documents/301",
+      "expected": "deny",
+      "observed": "allow",
+      "status": 200,
+      "variant": "other",
+      "detail": "bob (customer) read another subject's object via GET /lab/vulnerable/projects/201/documents/301 and got 200 and the response exposed the owner's data (ALICE_); the matrix only allows owners here.",
+      "evidence": {
+        "test_id": "vulnerable_read_nested_document::bob::other",
+        "status": 200,
+        "effect": "allow",
+        "latency_ms": 23.9,
+        "headers": {
+          "date": "Wed, 14 Oct 2026 18:50:20 GMT",
+          "server": "uvicorn",
+          "content-length": "139",
+          "content-type": "application/json"
+        },
+        "body_snippet": "{\"id\":301,\"project_id\":201,\"title\":\"Alice notes\",\"marker\":\"ALICE_DOC_CANARY_AB301\",\"project_name\":\"Alice Lab Project\",\"requested_by\":\"bob\"}",
+        "full_body": "",
+        "error": null,
+        "matched_markers": [
+          "ALICE_"
+        ],
+        "listed_tools": [],
+        "skipped": false
+      },
+      "curl": "curl -sS -X GET -H 'X-Lab-User: bob' http://127.0.0.1:8000/lab/vulnerable/projects/201/documents/301",
+      "request": {
+        "method": "GET",
+        "url": "http://127.0.0.1:8000/lab/vulnerable/projects/201/documents/301",
+        "headers": {
+          "X-Lab-User": "bob"
+        },
+        "body": null
+      },
+      "confidence": "confirmed",
+      "leaked_fields": [],
+      "group": "vulnerable_read_nested_document::GET::BOLA",
+      "cwe": "CWE-639",
+      "owasp_api": "API1:2023 Broken Object Level Authorization"
+    }
+  ],
+  "waived": [],
+  "warnings": []
+}

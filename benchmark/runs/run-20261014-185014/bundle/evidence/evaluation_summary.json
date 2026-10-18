@@ -1,0 +1,183 @@
+{
+  "run_id": "run-20261014-185014",
+  "timestamp_utc": "2026-10-14T18:50:20.409765+00:00",
+  "tool": {
+    "name": "overstep",
+    "version": "1.7.0",
+    "python_version": "3.11.9",
+    "mode": "read-only",
+    "target": "http://127.0.0.1:8000"
+  },
+  "summary": {
+    "total_executions": 16,
+    "positive_controls_count": 8,
+    "negative_probes_count": 8,
+    "unique_scenarios_tested": 8,
+    "unique_defects_detected": 2
+  },
+  "confusion_matrix": {
+    "true_positives": 4,
+    "false_positives": 0,
+    "true_negatives": 4,
+    "false_negatives": 0,
+    "inconclusive": 0
+  },
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "false_positive_rate": 0.0,
+    "inconclusive_rate": 0.0
+  },
+  "negative_probes": [
+    {
+      "catalog_id": "AB-BOLA-001",
+      "test_id": "vulnerable_read_account::alice::other",
+      "resource": "vulnerable_read_account",
+      "subject": "alice",
+      "expected_vulnerable": true,
+      "reported_vulnerable": true,
+      "classification": "TP",
+      "confidence": "confirmed",
+      "status": 200
+    },
+    {
+      "catalog_id": "AB-BOLA-005",
+      "test_id": "vulnerable_read_account::bob::other",
+      "resource": "vulnerable_read_account",
+      "subject": "bob",
+      "expected_vulnerable": true,
+      "reported_vulnerable": true,
+      "classification": "TP",
+      "confidence": "confirmed",
+      "status": 200
+    },
+    {
+      "catalog_id": "AB-BOLA-002",
+      "test_id": "secure_read_account::alice::other",
+      "resource": "secure_read_account",
+      "subject": "alice",
+      "expected_vulnerable": false,
+      "reported_vulnerable": false,
+      "classification": "TN",
+      "confidence": null,
+      "status": 403
+    },
+    {
+      "catalog_id": "AB-BOLA-006",
+      "test_id": "secure_read_account::bob::other",
+      "resource": "secure_read_account",
+      "subject": "bob",
+      "expected_vulnerable": false,
+      "reported_vulnerable": false,
+      "classification": "TN",
+      "confidence": null,
+      "status": 403
+    },
+    {
+      "catalog_id": "AB-NESTED-001",
+      "test_id": "vulnerable_read_nested_document::alice::other",
+      "resource": "vulnerable_read_nested_document",
+      "subject": "alice",
+      "expected_vulnerable": true,
+      "reported_vulnerable": true,
+      "classification": "TP",
+      "confidence": "confirmed",
+      "status": 200
+    },
+    {
+      "catalog_id": "AB-NESTED-003",
+      "test_id": "vulnerable_read_nested_document::bob::other",
+      "resource": "vulnerable_read_nested_document",
+      "subject": "bob",
+      "expected_vulnerable": true,
+      "reported_vulnerable": true,
+      "classification": "TP",
+      "confidence": "confirmed",
+      "status": 200
+    },
+    {
+      "catalog_id": "AB-NESTED-002",
+      "test_id": "secure_read_nested_document::alice::other",
+      "resource": "secure_read_nested_document",
+      "subject": "alice",
+      "expected_vulnerable": false,
+      "reported_vulnerable": false,
+      "classification": "TN",
+      "confidence": null,
+      "status": 403
+    },
+    {
+      "catalog_id": "AB-NESTED-004",
+      "test_id": "secure_read_nested_document::bob::other",
+      "resource": "secure_read_nested_document",
+      "subject": "bob",
+      "expected_vulnerable": false,
+      "reported_vulnerable": false,
+      "classification": "TN",
+      "confidence": null,
+      "status": 403
+    }
+  ],
+  "positive_controls": [
+    {
+      "test_id": "vulnerable_read_account::alice::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "vulnerable_read_account::bob::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "secure_read_account::alice::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "secure_read_account::bob::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "vulnerable_read_nested_document::alice::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "vulnerable_read_nested_document::bob::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "secure_read_nested_document::alice::self",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "test_id": "secure_read_nested_document::bob::self",
+      "status": 200,
+      "result": "PASS"
+    }
+  ],
+  "unsupported_cases": [
+    {
+      "catalog_id": "AB-NESTED-005",
+      "reason": "Parent/child relationship mismatch on vulnerable route returns 404; Overstep matrix cannot express combinatorial parent-child mismatches."
+    },
+    {
+      "catalog_id": "AB-NESTED-006",
+      "reason": "Parent/child relationship mismatch on secure route returns 404; Overstep matrix cannot express combinatorial parent-child mismatches."
+    }
+  ],
+  "deferred_cases": [
+    {
+      "catalog_id": "AB-BFLA-001",
+      "reason": "Admin report endpoint is a POST mutating operation; deferred to mutating milestone under read-only policy."
+    },
+    {
+      "catalog_id": "AB-BFLA-002",
+      "reason": "Admin report endpoint is a POST mutating operation; deferred to mutating milestone under read-only policy."
+    }
+  ]
+}

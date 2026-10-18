@@ -1,0 +1,29 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.env
+*.log
+.venv-overstep/
+
+# IDE and OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Private keys and secrets (must never be committed)
+*.key
+*.private.pem
+private_key.pem
+keys/private*
+*.priv.pem
+
+# Allow public keys for distribution and verification
+!public_key.pem
+!*.public.pem
+!*.pub.pem
+
+# Superseded run with earlier plan-count reporting bug
+benchmark/runs/run-20261014-183243/
