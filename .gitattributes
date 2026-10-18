@@ -1,0 +1,8 @@
+# Preserve exact bytes for signed evidence bundles.
+benchmark/bundles/** -text
+benchmark/runs/**/bundle/** -text
+
+# Preserve archived raw benchmark artifacts.
+benchmark/results/** -text
+benchmark/runs/**/raw/** -text
+benchmark/runs/**/evaluation_summary.json -text
