@@ -6,3 +6,6 @@ benchmark/runs/**/bundle/** -text
 benchmark/results/** -text
 benchmark/runs/**/raw/** -text
 benchmark/runs/**/evaluation_summary.json -text
+
+# Preserve archived run reports byte-for-byte.
+benchmark/runs/**/run_report.md -text
